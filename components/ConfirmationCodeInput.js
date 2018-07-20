@@ -1,38 +1,13 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
-import {
-  View,
-  TextInput,
-  StyleSheet,
-  Dimensions,
-  ViewPropTypes,
-} from 'react-native';
-import clone from 'lodash.clone';
-import findIndex from 'lodash.findindex';
-import indexOf from 'lodash.indexof';
-import merge from 'lodash.merge';
 
-// if ViewPropTypes is not defined fall back to View.propType (to support RN < 0.44)
-const viewPropTypes = ViewPropTypes || View.propTypes;
+import { View, TextInput, StyleSheet } from 'react-native';
 
-export default class ConfirmationCodeInput extends Component {
-  static propTypes = {
-    codeLength: PropTypes.number,
-    compareWithCode: PropTypes.string,
-    inputPosition: PropTypes.string,
-    size: PropTypes.number,
-    space: PropTypes.number,
-    className: PropTypes.string,
-    cellBorderWidth: PropTypes.number,
-    activeColor: PropTypes.string,
-    inactiveColor: PropTypes.string,
-    ignoreCase: PropTypes.bool,
-    autoFocus: PropTypes.bool,
-    codeInputStyle: TextInput.propTypes.style,
-    containerStyle: viewPropTypes.style,
-    onFulfill: PropTypes.func,
-  };
+const clone = arr => [...arr];
+const findIndex = (arr, fun) => arr.findIndex(fun);
+const indexOf = (arr, item) => arr.indexOf(item);
+const merge = (ob1, ob2) => ({ ...ob1, ...ob2 });
 
+export class ConfirmationCodeInput extends Component {
   static defaultProps = {
     codeLength: 5,
     inputPosition: 'center',
@@ -44,7 +19,7 @@ export default class ConfirmationCodeInput extends Component {
     inactiveColor: 'rgba(255, 255, 255, 0.2)',
     space: 8,
     compareWithCode: '',
-    ignoreCase: false,
+    ignoreCase: false
   };
 
   constructor(props) {
@@ -52,7 +27,7 @@ export default class ConfirmationCodeInput extends Component {
 
     this.state = {
       codeArr: new Array(this.props.codeLength).fill(''),
-      currentIndex: 0,
+      currentIndex: 0
     };
 
     this.codeInputRefs = [];
@@ -61,30 +36,24 @@ export default class ConfirmationCodeInput extends Component {
   componentDidMount() {
     const { compareWithCode, codeLength, inputPosition } = this.props;
     if (compareWithCode && compareWithCode.length !== codeLength) {
-      console.error(
-        'Invalid props: compareWith length is not equal to codeLength'
-      );
+      console.error('Invalid props: compareWith length is not equal to codeLength');
     }
 
-    if (
-      indexOf(['center', 'left', 'right', 'full-width'], inputPosition) === -1
-    ) {
-      console.error(
-        'Invalid input position. Must be in: center, left, right, full'
-      );
+    if (indexOf(['center', 'left', 'right', 'full-width'], inputPosition) === -1) {
+      console.error('Invalid input position. Must be in: center, left, right, full');
     }
   }
 
   clear() {
     this.setState({
       codeArr: new Array(this.props.codeLength).fill(''),
-      currentIndex: 0,
+      currentIndex: 0
     });
     this._setFocus(0);
   }
 
   _setFocus(index) {
-    this.codeInputRefs[index].focus();
+    this.codeInputRefs[index] && this.codeInputRefs[index].focus();
   }
 
   _blur(index) {
@@ -105,7 +74,7 @@ export default class ConfirmationCodeInput extends Component {
 
     this.setState({
       codeArr: newCodeArr,
-      currentIndex: index,
+      currentIndex: index
     });
   }
 
@@ -121,22 +90,22 @@ export default class ConfirmationCodeInput extends Component {
       case 'left':
         return {
           justifyContent: 'flex-start',
-          height: size,
+          height: size
         };
       case 'center':
         return {
           justifyContent: 'center',
-          height: size,
+          height: size
         };
       case 'right':
         return {
           justifyContent: 'flex-end',
-          height: size,
+          height: size
         };
       default:
         return {
           justifyContent: 'space-between',
-          height: size,
+          height: size
         };
     }
   }
@@ -146,21 +115,21 @@ export default class ConfirmationCodeInput extends Component {
     switch (inputPosition) {
       case 'left':
         return {
-          marginRight: space,
+          marginRight: space
         };
       case 'center':
         return {
           marginRight: space / 2,
-          marginLeft: space / 2,
+          marginLeft: space / 2
         };
       case 'right':
         return {
-          marginLeft: space,
+          marginLeft: space
         };
       default:
         return {
           marginRight: 0,
-          marginLeft: 0,
+          marginLeft: 0
         };
     }
   }
@@ -169,7 +138,7 @@ export default class ConfirmationCodeInput extends Component {
     const { cellBorderWidth, activeColor, inactiveColor, space } = this.props;
     let classStyle = {
       ...this._getInputSpaceStyle(space),
-      color: activeColor,
+      color: activeColor
     };
 
     switch (className) {
@@ -178,30 +147,30 @@ export default class ConfirmationCodeInput extends Component {
       case 'border-box':
         return merge(classStyle, {
           borderWidth: cellBorderWidth,
-          borderColor: active ? activeColor : inactiveColor,
+          borderColor: active ? activeColor : inactiveColor
         });
       case 'border-circle':
         return merge(classStyle, {
           borderWidth: cellBorderWidth,
           borderRadius: 50,
-          borderColor: active ? activeColor : inactiveColor,
+          borderColor: active ? activeColor : inactiveColor
         });
       case 'border-b':
         return merge(classStyle, {
           borderBottomWidth: cellBorderWidth,
-          borderColor: active ? activeColor : inactiveColor,
+          borderColor: active ? activeColor : inactiveColor
         });
       case 'border-b-t':
         return merge(classStyle, {
           borderTopWidth: cellBorderWidth,
           borderBottomWidth: cellBorderWidth,
-          borderColor: active ? activeColor : inactiveColor,
+          borderColor: active ? activeColor : inactiveColor
         });
       case 'border-l-r':
         return merge(classStyle, {
           borderLeftWidth: cellBorderWidth,
           borderRightWidth: cellBorderWidth,
-          borderColor: active ? activeColor : inactiveColor,
+          borderColor: active ? activeColor : inactiveColor
         });
       default:
         return className;
@@ -226,25 +195,12 @@ export default class ConfirmationCodeInput extends Component {
   };
 
   _onInputCode(baseCharacters, baseIndex) {
-    const {
-      codeLength,
-      onFulfill,
-      compareWithCode,
-      ignoreCase,
-      keyboardType,
-    } = this.props;
+    const { codeLength, onFulfill, compareWithCode, ignoreCase, keyboardType } = this.props;
 
-    const characters = this._synthesizeInput(baseCharacters).substring(
-      0,
-      codeLength - baseIndex
-    );
+    const characters = this._synthesizeInput(baseCharacters).substring(0, codeLength - baseIndex);
 
     let newCodeArr = clone(this.state.codeArr);
-    for (
-      let i = baseIndex, j = 0;
-      i < codeLength && j < characters.length;
-      i++ , j++
-    ) {
+    for (let i = baseIndex, j = 0; i < codeLength && j < characters.length; i++, j++) {
       newCodeArr[i] = characters[j];
     }
 
@@ -255,11 +211,7 @@ export default class ConfirmationCodeInput extends Component {
     const code = newCodeArr.join('');
     if (index === codeLength - 1 && code.length === codeLength) {
       if (compareWithCode) {
-        const isMatching = this._isMatchingCode(
-          code,
-          compareWithCode,
-          ignoreCase
-        );
+        const isMatching = this._isMatchingCode(code, compareWithCode, ignoreCase);
         onFulfill(isMatching, code);
         !isMatching && this.clear();
       } else {
@@ -273,7 +225,7 @@ export default class ConfirmationCodeInput extends Component {
     this.setState(prevState => {
       return {
         codeArr: newCodeArr,
-        currentIndex: index + 1,
+        currentIndex: index + 1
       };
     });
   }
@@ -288,11 +240,18 @@ export default class ConfirmationCodeInput extends Component {
       className,
       size,
       activeColor,
+      compareWithCode,
+      space,
+      cellBorderWidth,
+      inactiveColor,
+      ignoreCase,
+      onFulfill,
+      ...props
     } = this.props;
 
     const initialCodeInputStyle = {
       width: size,
-      height: size,
+      height: size
     };
 
     let codeInputs = [];
@@ -302,39 +261,22 @@ export default class ConfirmationCodeInput extends Component {
         <TextInput
           key={id}
           ref={ref => (this.codeInputRefs[id] = ref)}
-          style={[
-            styles.codeInput,
-            initialCodeInputStyle,
-            this._getClassStyle(className, this.state.currentIndex == id),
-            codeInputStyle,
-          ]}
+          style={[styles.codeInput, initialCodeInputStyle, this._getClassStyle(className, this.state.currentIndex == id), codeInputStyle]}
           underlineColorAndroid="transparent"
           selectionColor={activeColor}
           keyboardType={'name-phone-pad'}
           returnKeyType={'done'}
-          {...this.props}
+          {...props}
           autoFocus={autoFocus && id == 0}
           onFocus={() => this._onFocus(id)}
-          value={
-            this.state.codeArr[id] ? this.state.codeArr[id].toString() : ''
-          }
+          value={this.state.codeArr[id] ? this.state.codeArr[id].toString() : ''}
           onChangeText={text => this._onInputCode(text, id)}
           onKeyPress={e => this._onKeyPress(e)}
         />
       );
     }
 
-    return (
-      <View
-        style={[
-          styles.container,
-          this._getContainerStyle(size, inputPosition),
-          containerStyle,
-        ]}
-      >
-        {codeInputs}
-      </View>
-    );
+    return <View style={[styles.container, this._getContainerStyle(size, inputPosition), containerStyle]}>{codeInputs}</View>;
   }
 }
 
@@ -342,11 +284,12 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     flexDirection: 'row',
-    marginTop: 20,
+    marginTop: 20
   },
   codeInput: {
     backgroundColor: 'transparent',
     textAlign: 'center',
-    padding: 0,
-  },
+    outline: 'none',
+    padding: 0
+  }
 });
